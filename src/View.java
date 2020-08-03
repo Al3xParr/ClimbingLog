@@ -1,5 +1,4 @@
 import java.util.LinkedList;
-import java.util.List;
 
 import javax.swing.*;
 
@@ -39,11 +38,11 @@ public class View{
 		typeLbl = new JLabel("Type of climbing: ");
 		typeGroup = new ButtonGroup();
 		
-		JRadioButton sportRadio = new JRadioButton("Sport")
+		JRadioButton sportRadio = new JRadioButton("Sport");
 		sportRadio.setActionCommand("Sport");
-		JRadioButton tradRadio = new JRadioButton("Trad")
+		JRadioButton tradRadio = new JRadioButton("Trad");
 		tradRadio.setActionCommand("Trad");
-		JRadioButton boulderRadio = new JRadioButton("Bouldering")
+		JRadioButton boulderRadio = new JRadioButton("Bouldering");
 	    boulderRadio.setActionCommand("Bouldering");
 		
 		typeGroup.add(sportRadio);
@@ -66,7 +65,7 @@ public class View{
 		LinkedList<String> exercises =  Controller.getExercises();
 		
 		for (String ex : exercises) {
-			exerciseBox.add(new JCheckBox(ex));
+			exerciseBox.add(new JCheckBox(ex.replace("_", " ")));
 		}
 		
 		newExerciseLbl = new JLabel("Add new exercise...");
@@ -86,19 +85,93 @@ public class View{
 		frame = new JFrame("Climbing Log");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(500,500);
-		frame.setVisible(true);
+		
 		
 		panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
-		panel.setLayout(layout);
+		panel.setLayout(layout);	
 		layout.setAutoCreateContainerGaps(true);
 		layout.setAutoCreateGaps(true);
 		
-		layout.setHorizontalGroup(
-				layout.createSequentialGroup()
-					.addComponent(durationLbl)
-					.addComponent(durationTxt));
+		GroupLayout.SequentialGroup exSeqGroup = layout.createSequentialGroup();
+		exSeqGroup.addComponent(exercisesLbl);
+		for (JCheckBox btn : exerciseBox) {
+			exSeqGroup.addComponent(btn);
+		}
 		
+		GroupLayout.ParallelGroup exParaGroup = layout.createParallelGroup();
+		exParaGroup.addComponent(exercisesLbl);
+		for (JCheckBox btn : exerciseBox) {
+			exParaGroup.addComponent(btn);
+		}
+		
+		layout.setHorizontalGroup(
+				layout.createParallelGroup()
+					.addGroup(layout.createSequentialGroup()
+							.addComponent(dateLbl)
+							.addComponent(dateTxt))
+					.addGroup(layout.createSequentialGroup()
+							.addComponent(durationLbl)
+							.addComponent(durationTxt))
+					.addGroup(layout.createSequentialGroup()
+							.addComponent(maxGradeLbl)
+							.addComponent(maxGradeTxt))
+					.addGroup(layout.createSequentialGroup()
+							.addComponent(inOutLbl)
+							.addComponent(outRadio)
+							.addComponent(inRadio))
+					.addGroup(layout.createSequentialGroup()
+							.addComponent(typeLbl)
+							.addComponent(tradRadio)
+							.addComponent(boulderRadio)
+							.addComponent(sportRadio))
+					.addGroup(exSeqGroup)
+					.addGroup(layout.createSequentialGroup()
+							.addComponent(newExerciseLbl)
+							.addComponent(newExerciseTxt)
+							.addComponent(newExerciseBtn))
+					.addGroup(layout.createSequentialGroup()
+							.addComponent(commentLbl)
+							.addComponent(commentTxt))
+					.addGroup(layout.createSequentialGroup()
+							.addComponent(submitBtn))
+					);
+		
+		layout.setVerticalGroup(
+				layout.createSequentialGroup()
+					.addGroup(layout.createParallelGroup()
+							.addComponent(dateLbl)
+							.addComponent(dateTxt))
+					.addGroup(layout.createParallelGroup()
+							.addComponent(durationLbl)
+							.addComponent(durationTxt))
+					.addGroup(layout.createParallelGroup()
+							.addComponent(maxGradeLbl)
+							.addComponent(maxGradeTxt))
+					.addGroup(layout.createParallelGroup()
+							.addComponent(inOutLbl)
+							.addComponent(outRadio)
+							.addComponent(inRadio))
+					.addGroup(layout.createParallelGroup()
+							.addComponent(typeLbl)
+							.addComponent(tradRadio)
+							.addComponent(boulderRadio)
+							.addComponent(sportRadio))
+					.addGroup(exParaGroup)
+					.addGroup(layout.createParallelGroup()
+							.addComponent(newExerciseLbl)
+							.addComponent(newExerciseTxt)
+							.addComponent(newExerciseBtn))
+					.addGroup(layout.createParallelGroup()
+							.addComponent(commentLbl)
+							.addComponent(commentTxt))
+					.addGroup(layout.createParallelGroup()
+							.addComponent(submitBtn))
+					);
+					
+		frame.getContentPane().add(panel);
+		frame.pack();
+		frame.setVisible(true);
 		
 		
 	}
@@ -131,6 +204,10 @@ public class View{
 		return inOutGroup.getSelection().getActionCommand();
 	}
 	
+	public String getNewEx() {
+		return newExerciseBtn.getText();
+	}
+	
 	public LinkedList<String> getExercises(){
 		LinkedList<String> ex = new LinkedList<String>();
 		for (JCheckBox e : exerciseBox) {
@@ -144,8 +221,21 @@ public class View{
 	}
 	
 	public void errorMsg(String error) {
-		JOptionPane.showMessageDialog(frame, error,
-	               "Something went wrong!", JOptionPane.ERROR_MESSAGE);
+		JOptionPane.showMessageDialog(frame, error, "Something went wrong!", JOptionPane.ERROR_MESSAGE);
+	}
+	
+	public void userMsg(String msg) {
+		JOptionPane.showMessageDialog(frame, msg, "Message", JOptionPane.INFORMATION_MESSAGE);
+	}
+	
+	public boolean questionMsg(String qu) {
+		if (JOptionPane.showConfirmDialog(null, qu, "Question",JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+			return true;
+		} else { return false; }
+	}
+	
+	public void newExerciseAdded(String newEx) {
+		exerciseBox.add(new JCheckBox(newEx));
 	}
 	
 	

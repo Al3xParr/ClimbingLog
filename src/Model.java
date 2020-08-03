@@ -1,10 +1,12 @@
 import java.sql.*;
-
+import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.stream.Collectors;
 
 
 public class Model{
 	
+	/*
 	private int sessionId;
 	private String date;
 	private int duration;
@@ -12,14 +14,14 @@ public class Model{
 	private boolean indoor;
 	private String type;
 	private LinkedList<String> exercises;
-	
+	*/
 	private static Connection conn = null;
-	private String sql;
+	
 	
 	public Model() {
 		;
 	}
-	
+	/*
 	public Model(int sessionId, String date, int duration, String maxGrade, boolean indoor, String type, LinkedList<String> exercises){
 		this.sessionId = sessionId;
 		this.date = date;
@@ -29,7 +31,7 @@ public class Model{
 		this.type = type;
 		this.exercises = exercises;
 		
-	}
+	}*/
 	
 	private static Connection connect() {		
 		Connection dbConnection = null;
@@ -49,7 +51,7 @@ public class Model{
 				
 	}
 	
-	public void addSession(String date, int dur,  String max, int indoor, String type, LinkedList<String> exercises) {
+	public static boolean addSession(String date, int dur,  String max, int indoor, String type, LinkedList<String> exercises) {
 		
 		StringBuffer exString = new StringBuffer();
 		StringBuffer exValString = new StringBuffer();
@@ -59,11 +61,11 @@ public class Model{
 			exValString.append(", ?");
 		}
 				
-		sql = "INSERT INTO sessions (date, duration, maxGrade, indoor, type" + exString.toString() +") VALUES(?, ?, ?, ?, ?" + exValString.toString() + ")";
+		String sql = "INSERT INTO sessions (date, duration, maxGrade, indoor, type" + exString.toString() +") VALUES(?, ?, ?, ?, ?" + exValString.toString() + ")";
 		conn = Model.connect();
-		
+		PreparedStatement prepState = null;
 		try {
-			PreparedStatement prepState = conn.prepareStatement(sql);
+			prepState = conn.prepareStatement(sql);
 			prepState.setString(1, date);
 			prepState.setInt(2, dur);
 			prepState.setString(3, max);
@@ -75,14 +77,31 @@ public class Model{
 			
 			prepState.executeUpdate();
 			System.out.println("Successfully added new record");
+			return true;
 			
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
+			return false;
+		} finally {
+			Model.closeItem(prepState);
+			Model.closeItem(conn);
+			
 		}
+			
 
 	}
 	
-	public static void addExercise(String ex) {
+	public static boolean addExercise(String ex) {
+		
+		
+		String finalString = Arrays.stream(ex.split("\\s+"))
+		        .map(t -> t.substring(0, 1).toUpperCase() + t.substring(1))
+		        .collect(Collectors.joining("_"));
+		
+		/*
+		for (char ch : ex.toCharArray()) {
+			
+		}
 		
 		StringBuffer finalString = new StringBuffer();
 		String[] words = ex.split(" ");
@@ -91,23 +110,36 @@ public class Model{
 			finalString.append(Character.toUpperCase(str.charAt(0)));
 			finalString.append(str.substring(1, str.length()));
 		}
+		*/
+		LinkedList<String> currentEx = Model.getExercises();
 		
-
-		String sql = "ALTER TABLE sessions ADD COLUMN " + finalString.toString() + " INTEGER";
+		if (currentEx.contains(ex)) { return false;}
+		
+		String sql = "ALTER TABLE sessions ADD COLUMN " + finalString + " INTEGER";
 		conn = Model.connect();
+		Statement state = null;
 		
 		try {
-			Statement state = conn.createStatement();
+			state = conn.createStatement();
 			
 			state.executeQuery(sql);
 			
 			System.out.println("Successfully added new exercise");
 			
+			return true;
+			
 		} catch (SQLException e) {
+			
 			System.out.println(e.getMessage());
+			return false;
+		} finally {
+			Model.closeItem(state);
+			Model.closeItem(conn);
+			
 		}
 	}
 	
+	/*
 	public Model getSessionById(int id) {
 		sql = "FROM sessions SELECT * WHERE sessionId = " + String.valueOf(id);
 		
@@ -151,26 +183,24 @@ public class Model{
 		
 	}
 	
-	public static void main(String[] args) {
-		LinkedList<String> exer = new LinkedList<String>();
-		exer.add("PullUps");
-		
-		Model.addExercise("Board");
-		//myInstance.addSession("02-03-2020", 237, "7a", 1, "sport", exer);
-	}
+	*/
+	
 	
 	public static LinkedList<String> getExercises(){
-		String sql = "FROM sessions SELECT *";
+		String sql = "SELECT * FROM sessions";
 		conn = Model.connect();
+		Statement state = null;
+		ResultSet rs = null;
+		ResultSetMetaData rsMeta = null;
 		
 		LinkedList<String> currentEx = new LinkedList<String>();
 		
 		try {
-			Statement state = conn.createStatement();
+			state = conn.createStatement();
 			
-			ResultSet rs = state.executeQuery(sql);
+			rs = state.executeQuery(sql);
 			
-			ResultSetMetaData rsMeta = rs.getMetaData();
+			rsMeta = rs.getMetaData();
 			
 			int columnCount = rsMeta.getColumnCount();
 			
@@ -181,9 +211,26 @@ public class Model{
 			
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
+		} finally {
+			Model.closeItem(rsMeta);
+			Model.closeItem(rs);
+			Model.closeItem(state);
+			Model.closeItem(conn);
+			
 		}
 		return currentEx;
 		
+	}
+	
+	private static void closeItem(Object obj) {
+		AutoCloseable closeObj = (AutoCloseable) obj;
+		if (closeObj != null) {
+            try {
+				closeObj.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	    }
 		
 	}
 	
