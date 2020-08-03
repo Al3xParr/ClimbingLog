@@ -4,7 +4,5 @@ public class App{
 		Model m = new Model();
 		View v = new View();
 		Controller c = new Controller(v, m);
-		
-		
 	}
 }

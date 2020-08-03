@@ -4,6 +4,7 @@ import javax.swing.*;
 
 public class View{
 	
+	//Declaring all the components for the UI
 	private JPanel panel;
 	private JFrame frame;
 	private JLabel dateLbl;
@@ -27,7 +28,7 @@ public class View{
 	
 	public View() {
 		
-		
+		//Filling all the UI components
 		dateLbl = new JLabel("Date: ");
 		dateTxt = new JTextField();
 		
@@ -49,7 +50,6 @@ public class View{
 		typeGroup.add(tradRadio);
 		typeGroup.add(boulderRadio);
 		
-		
 		inOutLbl = new JLabel("Where:");
 		inOutGroup = new ButtonGroup();
 		JRadioButton inRadio = new JRadioButton("Indoors");
@@ -60,6 +60,7 @@ public class View{
 		inOutGroup.add(inRadio);
 		inOutGroup.add(outRadio);
 		
+		//Getting the current list of exercises for the db to display them
 		exercisesLbl = new JLabel("Exercises:");	
 		exerciseBox = new LinkedList<JCheckBox>();
 		LinkedList<String> exercises =  Controller.getExercises();
@@ -81,18 +82,17 @@ public class View{
 		
 		submitBtn = new JButton("Submit");
 		
-		
+		//Creating the structure of the window
 		frame = new JFrame("Climbing Log");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(500,500);
-		
-		
 		panel = new JPanel();
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);	
 		layout.setAutoCreateContainerGaps(true);
 		layout.setAutoCreateGaps(true);
 		
+		//Creating the groups of check boxes for the exercises
 		GroupLayout.SequentialGroup exSeqGroup = layout.createSequentialGroup();
 		exSeqGroup.addComponent(exercisesLbl);
 		for (JCheckBox btn : exerciseBox) {
@@ -105,6 +105,7 @@ public class View{
 			exParaGroup.addComponent(btn);
 		}
 		
+		//Dictating the layout of the window
 		layout.setHorizontalGroup(
 				layout.createParallelGroup()
 					.addGroup(layout.createSequentialGroup()
@@ -172,10 +173,9 @@ public class View{
 		frame.getContentPane().add(panel);
 		frame.pack();
 		frame.setVisible(true);
-		
-		
 	}
 	
+	//Setters and getters for components and values
 	public JButton getAddExBtn() {
 		return this.newExerciseBtn;
 	}
@@ -220,6 +220,7 @@ public class View{
 		return commentTxt.getText();
 	}
 	
+	//Methods to display different messages to the user
 	public void errorMsg(String error) {
 		JOptionPane.showMessageDialog(frame, error, "Something went wrong!", JOptionPane.ERROR_MESSAGE);
 	}
@@ -234,6 +235,7 @@ public class View{
 		} else { return false; }
 	}
 	
+	//Add new exercise into the window
 	public void newExerciseAdded(String newEx) {
 		exerciseBox.add(new JCheckBox(newEx));
 	}

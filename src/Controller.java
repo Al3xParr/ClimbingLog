@@ -7,35 +7,40 @@ public class Controller{
 	private View view;
 	private Model model;
 	
+	//Constructor
 	public Controller(View view, Model model) {
 		this.view = view;
 		this.model = model;
 	}
 	
+	//Returns linked list of exercises from the db
 	public static LinkedList<String> getExercises(){
 		return Model.getExercises();
 	}
 	
+	//Adds the listeners for the buttons of the window
 	public void addListeners() {
 		view.getAddExBtn().addActionListener(e -> addExBtnPressed());
 		view.getSubmitBtn().addActionListener(e -> submitBtnPressed());
 	}
 	
+	//Add a new exercise to the db
 	public void addExBtnPressed() {
 		String newEx = view.getNewEx();
 		String qString = "Are you sure you want to add " + newEx + " as a new exercise?";
 		boolean success = false;
 		
+		//Asks user if they are sure they want to add the exercise
 		if (view.questionMsg(qString)) { 
 			success = Model.addExercise(newEx);
 			if (success) {
 				view.userMsg("Successfully added new exercise");
 				view.newExerciseAdded(newEx);}
 			else { view.errorMsg("Something went wrong! Check the exercise isn't already an option!");}
-		}
-				
+		}	
 	}
 	
+	//Processess user input before adding new record to db
 	public void submitBtnPressed() {
 		String date;
 		int dur = 0;
@@ -98,6 +103,7 @@ public class Controller{
 				
 		Model.addSession(date, dur, max, indoor, type, ex);
 		
+		//Creates a StringBuffer to save all the information to a txt diary
 		StringBuffer sessionString = new StringBuffer();
 		sessionString.append(date);
 		sessionString.append("\nDuration: " + dur);
@@ -111,7 +117,6 @@ public class Controller{
 			sessionString.append(comma + e);
 			comma = ", ";
 		}
-		
 		sessionString.append("Comment:\n" + view.getComment());
 		
 		try {
