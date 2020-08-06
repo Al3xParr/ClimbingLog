@@ -33,7 +33,11 @@ public class Model{
 		StringBuffer exString = new StringBuffer();
 		StringBuffer exValString = new StringBuffer();
 		for (String ex : exercises) {
+			
 			exString.append(", ");
+			ex = Arrays.stream(ex.split("\\s+"))
+			        .map(t -> t.substring(0, 1).toUpperCase() + t.substring(1))
+			        .collect(Collectors.joining("_"));
 			exString.append(ex);
 			exValString.append(", ?");
 		}
@@ -85,17 +89,20 @@ public class Model{
 		Statement state = null;
 		
 		try {
+			System.out.println("tried");
 			state = conn.createStatement();
-			state.executeQuery(sql);
+			System.out.println("tried2");
+			state.executeUpdate(sql);
 			
 			System.out.println("Successfully added new exercise");
 			return true;
 			
 		} catch (SQLException e) {
-			
+			System.out.println("catch");
 			System.out.println(e.getMessage());
 			return false;
 		} finally {
+			System.out.println("finally");
 			//Closes the items relating to the db communication
 			Model.closeItem(state);
 			Model.closeItem(conn);
@@ -123,7 +130,7 @@ public class Model{
 			int columnCount = rsMeta.getColumnCount();
 			
 			//Gets all the exercises from the column names
-			for (int i = 7; i < columnCount ; i++) {
+			for (int i = 7; i <= columnCount ; i++) {
 				currentEx.add(rsMeta.getColumnName(i));
 			}
 			
@@ -136,6 +143,7 @@ public class Model{
 			Model.closeItem(state);
 			Model.closeItem(conn);
 		}
+		
 		return currentEx;
 		
 	}

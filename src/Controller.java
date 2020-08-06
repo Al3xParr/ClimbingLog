@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -11,6 +12,7 @@ public class Controller{
 	public Controller(View view, Model model) {
 		this.view = view;
 		this.model = model;
+		this.addListeners();
 	}
 	
 	//Returns linked list of exercises from the db
@@ -38,9 +40,10 @@ public class Controller{
 				view.newExerciseAdded(newEx);}
 			else { view.errorMsg("Something went wrong! Check the exercise isn't already an option!");}
 		}	
+		view.getNewExTxt().setText("");
 	}
 	
-	//Processess user input before adding new record to db
+	//Processes user input before adding new record to db
 	public void submitBtnPressed() {
 		String date;
 		int dur = 0;
@@ -76,7 +79,7 @@ public class Controller{
 		blderGrdFormat[0] = "[vV]\\d{1,2}";
 		blderGrdFormat[1] = "\\d[abc][+]{0,1}";
 		
-		String[] trdGrdFormat = new String[5];
+		String[] trdGrdFormat = new String[9];
 		trdGrdFormat[0] = "Mod";
 		trdGrdFormat[1] = "Diff";
 		trdGrdFormat[2] = "VDiff";
@@ -117,12 +120,14 @@ public class Controller{
 			sessionString.append(comma + e);
 			comma = ", ";
 		}
-		sessionString.append("Comment:\n" + view.getComment());
+		sessionString.append("\nComment:\n" + view.getComment() + "\n\n\n");
+		
 		
 		try {
-			FileWriter txtFile = new FileWriter("sessionsDiary.txt");
-			txtFile.write(sessionString.toString());
-			txtFile.close();
+			File txtFile = new File(System.getProperty("user.dir")+ "\\src\\sessionDiary.txt");
+			FileWriter fileWriter = new FileWriter(txtFile);
+			fileWriter.write(sessionString.toString());
+			fileWriter.close();
 		} catch (IOException e) {
 		      System.out.println("An error occurred.");
 		      e.printStackTrace();
